@@ -1,0 +1,82 @@
+<html>
+  <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="starter-template">
+        <h1>TP TWAP Arduino Interface</h1>
+        <p class="lead"><br></p>
+      </div>
+      <div class="row">
+      <div class="col-md-4">
+   <!--   <h4>Messages </h4>
+      <textarea class="form-control" style="background:#222; color:#00ff00;" rows="8" id="inData"></textarea>
+      </div> -->
+ <h4> Les Etats du porte </h4>
+     <div class="col-md-4">
+   
+    
+       <table>
+        <tbody>
+          
+       <script>  </script>
+          
+        </tbody>
+      </table>
+       
+      </div>
+   
+
+
+
+   
+      <div class="col-md-4">
+      <h4> Alarme </h4>
+      <p><input type="text" class="form-control" id="ledDelay" name="ledDelay" value="" /></p>
+      <p><button id="ledSet" class="btn btn-primary">Envoyer</button></p>
+      </div>
+    </div>
+    </div>
+
+
+       <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+
+      var socket = io.connect('http://localhost:3000');
+      var count = 0;
+
+      socket.on('news', function (data) {
+        console.log(data);
+      });
+
+      socket.on('sensor', function (data) {
+        if ($("#inData")[0]) {
+	  if (count%30 === 0) {
+            console.log("Incoming sensor data:",data.raw);
+            $("#inData").append(data.raw+"\r");
+            $("#inData").animate({scrollTop:$("#inData")[0].scrollHeight - $("#inData").height()},200);
+	  };
+	  count += 1;
+	};
+      });
+
+      $('#ledSet').on('click',function(){
+        var tmp = parseInt($('#ledDelay').val(),10);
+        console.log("Setting LED Delay:",tmp)
+        socket.emit('led',{delay:tmp});
+      });
+
+      $('.servobtn').button();
+
+      $('.servobtn').on('change',function(){
+          console.log("Setting Servo Pos:",$('input[name=servo]:checked').val())
+          socket.emit('servo',{pos:$('input[name=servo]:checked').val()});
+      });
+    </script>
+  </body>
+</html>
